@@ -13,7 +13,7 @@ var modelName = 'gpt-4o'
 var modelDeploymentName = 'gpt-4o'
 
 // Create Azure OpenAI in Sweden Central (GPT-4o availability)
-resource openAI 'Microsoft.CognitiveServices/accounts@2021-10-01' = {
+resource openAI 'Microsoft.CognitiveServices/accounts@2023-05-01' = {
   name: openAIName
   location: 'swedencentral'
   kind: 'OpenAI'
@@ -44,7 +44,7 @@ resource modelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2023-
 }
 
 // Create AI Search
-resource search 'Microsoft.Search/searchServices@2021-04-01-preview' = {
+resource search 'Microsoft.Search/searchServices@2023-11-01' = {
   name: searchName
   location: location
   sku: {

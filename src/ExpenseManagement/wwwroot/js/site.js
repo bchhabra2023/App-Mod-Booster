@@ -146,13 +146,17 @@ async function approveExpense(expenseId) {
         return;
     }
     
+    // TODO: Get actual reviewer ID from authenticated user context
+    // For now using default manager ID (2) - should be replaced with real authentication
+    const reviewerId = 2;
+    
     try {
         const response = await fetch(`/api/expenses/${expenseId}/approve`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(2) // Default reviewer ID
+            body: JSON.stringify(reviewerId)
         });
         
         if (response.ok) {
@@ -173,13 +177,17 @@ async function rejectExpense(expenseId) {
         return;
     }
     
+    // TODO: Get actual reviewer ID from authenticated user context
+    // For now using default manager ID (2) - should be replaced with real authentication
+    const reviewerId = 2;
+    
     try {
         const response = await fetch(`/api/expenses/${expenseId}/reject`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(2) // Default reviewer ID
+            body: JSON.stringify(reviewerId)
         });
         
         if (response.ok) {
