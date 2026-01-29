@@ -1,0 +1,222 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Expense Management System";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="error-banner">
+            <strong>⚠️ Error:</strong> @Model.ErrorMessage
+            <br />
+            <small>@Model.ErrorDetails</small>
+        </div>
+    }
+
+    <div class="container">
+        <header class="app-header">
+            <h1>💰 Expense Management System</h1>
+            <p>Modern Cloud-Based Expense Tracking</p>
+        </header>
+
+        <div class="nav-buttons">
+            <button class="btn btn-primary" onclick="showSection('expenses-list')">📋 View Expenses</button>
+            <button class="btn btn-success" onclick="showSection('add-expense')">➕ Add Expense</button>
+            <button class="btn btn-info" onclick="showSection('approve-expenses')">✅ Approve Expenses</button>
+            <button class="btn btn-secondary" onclick="showSection('chat-ui')">💬 AI Chat Assistant</button>
+        </div>
+
+        <!-- Expenses List Section -->
+        <div id="expenses-list" class="section active">
+            <h2>All Expenses</h2>
+            
+            <div class="filter-section">
+                <input type="text" id="filterInput" class="form-control" placeholder="Filter expenses..." onkeyup="filterExpenses()" />
+                <select id="statusFilter" class="form-select" onchange="filterByStatus()">
+                    <option value="">All Statuses</option>
+                    <option value="Draft">Draft</option>
+                    <option value="Submitted">Submitted</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Rejected">Rejected</option>
+                </select>
+            </div>
+
+            <div class="table-container">
+                <table class="expense-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Category</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>User</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expensesTableBody">
+                        @if (Model.Expenses != null && Model.Expenses.Any())
+                        {
+                            @foreach (var expense in Model.Expenses)
+                            {
+                                <tr>
+                                    <td>@expense.ExpenseDate.ToString("dd/MM/yyyy")</td>
+                                    <td>@expense.CategoryName</td>
+                                    <td>£@expense.Amount.ToString("F2")</td>
+                                    <td><span class="status-badge status-@expense.StatusName.ToLower()">@expense.StatusName</span></td>
+                                    <td>@expense.UserName</td>
+                                    <td>@(expense.Description ?? "-")</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center">No expenses found</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Add Expense Section -->
+        <div id="add-expense" class="section">
+            <h2>Add New Expense</h2>
+            
+            <form id="addExpenseForm" class="expense-form">
+                <div class="form-group">
+                    <label>User:</label>
+                    <select id="userId" class="form-select" required>
+                        <option value="">Select User</option>
+                        @if (Model.Users != null)
+                        {
+                            @foreach (var user in Model.Users)
+                            {
+                                <option value="@user.UserId">@user.UserName (@user.Email)</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Amount (£):</label>
+                    <input type="number" id="amount" class="form-control" step="0.01" min="0" placeholder="0.00" required />
+                </div>
+
+                <div class="form-group">
+                    <label>Date:</label>
+                    <input type="date" id="expenseDate" class="form-control" required />
+                </div>
+
+                <div class="form-group">
+                    <label>Category:</label>
+                    <select id="categoryId" class="form-select" required>
+                        <option value="">Select Category</option>
+                        @if (Model.Categories != null)
+                        {
+                            @foreach (var category in Model.Categories)
+                            {
+                                <option value="@category.CategoryId">@category.CategoryName</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Description:</label>
+                    <textarea id="description" class="form-control" rows="4" placeholder="Enter expense description..."></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-success">💾 Submit Expense</button>
+            </form>
+
+            <div id="addExpenseResult" class="result-message"></div>
+        </div>
+
+        <!-- Approve Expenses Section -->
+        <div id="approve-expenses" class="section">
+            <h2>Approve Pending Expenses</h2>
+            
+            <div class="filter-section">
+                <input type="text" id="approveFilterInput" class="form-control" placeholder="Filter pending expenses..." onkeyup="filterApproveExpenses()" />
+            </div>
+
+            <div class="table-container">
+                <table class="expense-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Category</th>
+                            <th>Amount</th>
+                            <th>User</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="approveTableBody">
+                        @if (Model.PendingExpenses != null && Model.PendingExpenses.Any())
+                        {
+                            @foreach (var expense in Model.PendingExpenses)
+                            {
+                                <tr>
+                                    <td>@expense.ExpenseDate.ToString("dd/MM/yyyy")</td>
+                                    <td>@expense.CategoryName</td>
+                                    <td>£@expense.Amount.ToString("F2")</td>
+                                    <td>@expense.UserName</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-success" onclick="approveExpense(@expense.ExpenseId)">✅ Approve</button>
+                                        <button class="btn btn-sm btn-danger" onclick="rejectExpense(@expense.ExpenseId)">❌ Reject</button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center">No pending expenses</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Chat UI Section -->
+        <div id="chat-ui" class="section">
+            <h2>💬 AI Chat Assistant</h2>
+            <div id="chat-container" class="chat-container">
+                <div id="chat-messages" class="chat-messages">
+                    <div class="chat-message assistant">
+                        <div class="message-content">
+                            <strong>Assistant:</strong><br />
+                            Hello! I'm your Expense Management AI Assistant. I can help you:
+                            <ul>
+                                <li>View and search expenses</li>
+                                <li>Create new expenses</li>
+                                <li>Submit expenses for approval</li>
+                                <li>Approve or reject expenses</li>
+                                <li>View users and categories</li>
+                            </ul>
+                            How can I help you today?
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-input-container">
+                    <input type="text" id="chat-input" class="form-control" placeholder="Type your message..." onkeypress="handleChatKeyPress(event)" />
+                    <button class="btn btn-primary" onclick="sendChatMessage()">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/js/site.js"></script>
+</body>
+</html>
