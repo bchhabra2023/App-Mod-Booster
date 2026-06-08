@@ -1,0 +1,69 @@
+@page
+@model ExpenseApp.Pages.Expenses.AddModel
+@{
+    ViewData["Title"] = "Add Expense";
+}
+
+@if (Model.Error?.HasError == true)
+{
+    <div class="error-banner">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <div class="error-text">@Model.Error.DisplayMessage</div>
+    </div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success d-flex align-items-center gap-2" role="alert" style="border-radius:8px;">
+        <i class="bi bi-check-circle-fill"></i> @TempData["Success"]
+    </div>
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="data-card p-4">
+            <h5 class="fw-bold mb-4"><i class="bi bi-plus-circle me-2 text-primary"></i>New Expense</h5>
+            <form method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="UserId" value="@Model.DefaultUserId" />
+                <div class="mb-3 text-muted small">
+                    Submitting as <strong>@Model.DefaultUserName</strong>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Category <span class="text-danger">*</span></label>
+                    <select name="CategoryId" class="form-select" required>
+                        <option value="">— Select category —</option>
+                        @foreach (var c in Model.Categories)
+                        {
+                            <option value="@c.CategoryId">@c.CategoryName</option>
+                        }
+                    </select>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Amount (£) <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">£</span>
+                            <input type="number" name="AmountGbp" class="form-control" step="0.01" min="0.01" placeholder="0.00" required />
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Date <span class="text-danger">*</span></label>
+                        <input type="date" name="ExpenseDate" class="form-control"
+                               value="@DateTime.UtcNow.ToString("yyyy-MM-dd")" required />
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Description</label>
+                    <textarea name="Description" class="form-control" rows="3"
+                              placeholder="Optional description of the expense..."></textarea>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary-custom">
+                        <i class="bi bi-save me-1"></i>Save Expense
+                    </button>
+                    <a href="/Expenses/Index" class="btn btn-outline-secondary" style="border-radius:8px;">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

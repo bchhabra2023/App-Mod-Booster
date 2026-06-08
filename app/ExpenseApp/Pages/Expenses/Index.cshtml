@@ -1,0 +1,115 @@
+@page
+@model ExpenseApp.Pages.Expenses.ExpensesIndexModel
+@{
+    ViewData["Title"] = "All Expenses";
+}
+
+@if (Model.Error?.HasError == true)
+{
+    <div class="error-banner">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <div class="error-text">@Model.Error.DisplayMessage</div>
+    </div>
+}
+
+<div class="data-card">
+    <div class="card-header-custom">
+        <h5><i class="bi bi-list-ul me-2"></i>Expenses</h5>
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+            <!-- Status filter -->
+            <select id="statusFilter" class="form-select form-select-sm" style="width:160px;border-radius:6px;">
+                <option value="">All Statuses</option>
+                <option value="Draft">Draft</option>
+                <option value="Submitted">Submitted</option>
+                <option value="Approved">Approved</option>
+                <option value="Rejected">Rejected</option>
+            </select>
+            <input id="searchInput" type="text" class="form-control form-control-sm"
+                   placeholder="Search..." style="width:200px;border-radius:6px;" />
+            <a href="/Expenses/Add" class="btn btn-primary-custom btn-sm" style="padding:6px 16px;">
+                <i class="bi bi-plus-lg me-1"></i>Add New
+            </a>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-custom" id="expensesTable">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Employee</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th class="text-end">Amount (£)</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var e in Model.Expenses)
+                {
+                    var badgeClass = e.StatusName switch
+                    {
+                        "Approved"  => "badge-approved",
+                        "Submitted" => "badge-submitted",
+                        "Rejected"  => "badge-rejected",
+                        _           => "badge-draft"
+                    };
+                    <tr data-status="@e.StatusName">
+                        <td>@e.ExpenseDate.ToString("dd MMM yyyy")</td>
+                        <td>@e.UserName</td>
+                        <td>@e.CategoryName</td>
+                        <td>@(e.Description?.Length > 60 ? e.Description[..57] + "..." : e.Description ?? "—")</td>
+                        <td class="text-end fw-semibold">@e.AmountGbp.ToString("N2")</td>
+                        <td><span class="badge @badgeClass px-2 py-1" style="border-radius:6px;font-size:.78rem;">@e.StatusName</span></td>
+                        <td>
+                            @if (e.StatusName == "Draft")
+                            {
+                                <button class="btn btn-sm btn-outline-primary btn-submit-expense"
+                                        data-expense-id="@e.ExpenseId" style="font-size:.78rem;">
+                                    Submit
+                                </button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    // Filter by status dropdown
+    document.getElementById('statusFilter').addEventListener('change', filterTable);
+    document.getElementById('searchInput').addEventListener('input', filterTable);
+
+    function filterTable() {
+        const status = document.getElementById('statusFilter').value.toLowerCase();
+        const search = document.getElementById('searchInput').value.toLowerCase();
+        document.querySelectorAll('#expensesTable tbody tr').forEach(row => {
+            const rowStatus = row.dataset.status?.toLowerCase() ?? '';
+            const rowText   = row.textContent.toLowerCase();
+            const statusOk = !status || rowStatus === status;
+            const searchOk = !search || rowText.includes(search);
+            row.style.display = statusOk && searchOk ? '' : 'none';
+        });
+    }
+
+    // Submit expense
+    document.querySelectorAll('.btn-submit-expense').forEach(btn => {
+        btn.addEventListener('click', async function () {
+            const id = this.dataset.expenseId;
+            if (!confirm('Submit this expense for approval?')) return;
+            try {
+                const res = await fetch(`/api/expenses/${id}/submit`, { method: 'PUT' });
+                if (res.ok) {
+                    location.reload();
+                } else {
+                    const body = await res.json();
+                    alert('Error: ' + (body.message || body.error || 'Unknown error'));
+                }
+            } catch(e) { alert('Request failed: ' + e.message); }
+        });
+    });
+</script>
+}
