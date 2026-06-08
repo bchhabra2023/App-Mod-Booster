@@ -1,0 +1,5 @@
+html { font-size: 14px; }
+@media (min-width: 768px) { html { font-size: 16px; } }
+body { font-family: "Segoe UI", sans-serif; }
+.card { border: none; border-radius: 14px; }
+.table > :not(caption) > * > * { padding: 0.85rem; }
