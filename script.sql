@@ -1,10 +1,10 @@
-IF EXISTS (SELECT * FROM sys.database_principals WHERE name = 'mid-appmodassist')
+IF EXISTS (SELECT * FROM sys.database_principals WHERE name = 'MANAGED-IDENTITY-NAME')
 BEGIN
-    DROP USER [mid-appmodassist];
+    DROP USER [MANAGED-IDENTITY-NAME];
 END;
 
-CREATE USER [mid-appmodassist] FROM EXTERNAL PROVIDER;
-ALTER ROLE db_datareader ADD MEMBER [mid-appmodassist];
-ALTER ROLE db_datawriter ADD MEMBER [mid-appmodassist];
-GRANT EXECUTE TO [mid-appmodassist];
+CREATE USER [MANAGED-IDENTITY-NAME] FROM EXTERNAL PROVIDER;
+ALTER ROLE db_datareader ADD MEMBER [MANAGED-IDENTITY-NAME];
+ALTER ROLE db_datawriter ADD MEMBER [MANAGED-IDENTITY-NAME];
+GRANT EXECUTE TO [MANAGED-IDENTITY-NAME];
 GO

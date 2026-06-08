@@ -60,6 +60,9 @@ pip3 install --quiet pyodbc azure-identity
 export SQL_SERVER_FQDN
 export SQL_DATABASE_NAME
 
+# Replace managed identity name in SQL role script (cross-platform)
+sed -i.bak "s/MANAGED-IDENTITY-NAME/${MANAGED_IDENTITY_NAME}/g" script.sql && rm -f script.sql.bak
+
 # Run Python scripts
 python3 run-sql.py
 python3 run-sql-dbrole.py
