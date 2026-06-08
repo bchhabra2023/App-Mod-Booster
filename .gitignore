@@ -1,0 +1,31 @@
+# .NET build artifacts
+bin/
+obj/
+
+# User secrets
+*.user
+appsettings.Development.json
+
+# VS / Rider
+.vs/
+.idea/
+*.suo
+*.sln.docstates
+
+# Publish output
+/tmp/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+
+# macOS
+.DS_Store
+
+# Backup files created by sed -i.bak
+*.bak
+
+# app.zip must NOT be excluded — it is used by the deploy scripts
+!app.zip

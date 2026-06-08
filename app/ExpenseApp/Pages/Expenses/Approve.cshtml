@@ -1,0 +1,115 @@
+@page
+@model ExpenseApp.Pages.Expenses.ApproveModel
+@{
+    ViewData["Title"] = "Approve Expenses";
+}
+
+@if (Model.Error?.HasError == true)
+{
+    <div class="error-banner">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <div class="error-text">@Model.Error.DisplayMessage</div>
+    </div>
+}
+
+<div id="actionResult" class="mb-3" style="display:none;"></div>
+
+<div class="data-card">
+    <div class="card-header-custom">
+        <h5><i class="bi bi-check2-circle me-2"></i>Pending Approval</h5>
+        <span class="badge bg-primary rounded-pill">@Model.PendingExpenses.Count</span>
+    </div>
+
+    @if (!Model.PendingExpenses.Any())
+    {
+        <div class="p-4 text-center text-muted">
+            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+            No expenses pending approval.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-custom">
+                <thead>
+                    <tr>
+                        <th>Submitted</th>
+                        <th>Employee</th>
+                        <th>Category</th>
+                        <th>Description</th>
+                        <th class="text-end">Amount (£)</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var e in Model.PendingExpenses)
+                    {
+                        <tr id="row-@e.ExpenseId">
+                            <td>@(e.SubmittedAt?.ToString("dd MMM yyyy") ?? "—")</td>
+                            <td>@e.UserName</td>
+                            <td>@e.CategoryName</td>
+                            <td>@(e.Description ?? "—")</td>
+                            <td class="text-end fw-semibold">@e.AmountGbp.ToString("N2")</td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-success-custom btn-approve"
+                                            data-expense-id="@e.ExpenseId" data-reviewer="@Model.ReviewerUserId">
+                                        <i class="bi bi-check-lg me-1"></i>Approve
+                                    </button>
+                                    <button class="btn btn-danger-custom btn-reject"
+                                            data-expense-id="@e.ExpenseId" data-reviewer="@Model.ReviewerUserId">
+                                        <i class="bi bi-x-lg me-1"></i>Reject
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@section Scripts {
+<script>
+    async function handleAction(expenseId, action, reviewedBy) {
+        const url = `/api/expenses/${expenseId}/${action}`;
+        try {
+            const res = await fetch(url, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ reviewedBy: reviewedBy })
+            });
+            const body = await res.json();
+            const resultDiv = document.getElementById('actionResult');
+            if (res.ok && body.success) {
+                resultDiv.className = 'alert alert-success';
+                resultDiv.textContent = `Expense #${expenseId} has been ${action}d.`;
+                document.getElementById(`row-${expenseId}`)?.remove();
+            } else {
+                resultDiv.className = 'alert alert-danger';
+                resultDiv.textContent = body.message || body.error || 'Action failed.';
+            }
+            resultDiv.style.display = 'block';
+            setTimeout(() => { resultDiv.style.display = 'none'; }, 4000);
+        } catch(e) {
+            alert('Request failed: ' + e.message);
+        }
+    }
+
+    document.querySelectorAll('.btn-approve').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (confirm('Approve this expense?')) {
+                handleAction(this.dataset.expenseId, 'approve', parseInt(this.dataset.reviewer));
+            }
+        });
+    });
+    document.querySelectorAll('.btn-reject').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (confirm('Reject this expense?')) {
+                handleAction(this.dataset.expenseId, 'reject', parseInt(this.dataset.reviewer));
+            }
+        });
+    });
+</script>
+}
