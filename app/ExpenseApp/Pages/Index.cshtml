@@ -1,0 +1,99 @@
+@page
+@model ExpenseApp.Pages.IndexModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+@if (Model.Error?.HasError == true)
+{
+    <div class="error-banner">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <div class="error-text">@Model.Error.DisplayMessage</div>
+    </div>
+}
+
+<!-- Summary Cards -->
+<div class="row g-3 mb-4">
+    @foreach (var s in Model.Summary)
+    {
+        var (icon, colour) = s.StatusName switch
+        {
+            "Approved"  => ("bi-check-circle-fill", "#16a34a"),
+            "Submitted" => ("bi-clock-fill", "#1d4ed8"),
+            "Rejected"  => ("bi-x-circle-fill", "#dc2626"),
+            _           => ("bi-pencil-fill", "#64748b")
+        };
+        <div class="col-sm-6 col-xl-3">
+            <div class="stat-card">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="stat-label text-uppercase fw-semibold">@s.StatusName</span>
+                    <i class="bi @icon fs-4" style="color:@colour"></i>
+                </div>
+                <div class="stat-value">@s.ExpenseCount</div>
+                <div class="stat-label">£@s.TotalAmountGbp.ToString("N2") total</div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Quick Actions -->
+<div class="row g-3 mb-4">
+    <div class="col-12">
+        <div class="stat-card d-flex gap-3 flex-wrap">
+            <a href="/Expenses/Add" class="btn btn-primary-custom">
+                <i class="bi bi-plus-lg me-1"></i>Add Expense
+            </a>
+            <a href="/Expenses/Approve" class="btn btn-success-custom">
+                <i class="bi bi-check2-circle me-1"></i>Review &amp; Approve
+            </a>
+            <a href="/Expenses/Index" class="btn btn-outline-secondary btn-sm" style="border-radius:8px;padding:8px 20px;">
+                <i class="bi bi-list-ul me-1"></i>View All Expenses
+            </a>
+            <a href="/Chat" class="btn btn-outline-primary btn-sm" style="border-radius:8px;padding:8px 20px;">
+                <i class="bi bi-chat-dots me-1"></i>AI Assistant
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Expenses -->
+<div class="data-card">
+    <div class="card-header-custom">
+        <h5><i class="bi bi-clock-history me-2"></i>Recent Expenses</h5>
+        <a href="/Expenses/Index" class="btn btn-sm btn-outline-secondary" style="border-radius:6px;">View All</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-custom">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Employee</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th class="text-end">Amount</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var e in Model.RecentExpenses)
+                {
+                    var badgeClass = e.StatusName switch
+                    {
+                        "Approved"  => "badge-approved",
+                        "Submitted" => "badge-submitted",
+                        "Rejected"  => "badge-rejected",
+                        _           => "badge-draft"
+                    };
+                    <tr>
+                        <td>@e.ExpenseDate.ToString("dd MMM yyyy")</td>
+                        <td>@e.UserName</td>
+                        <td>@e.CategoryName</td>
+                        <td>@(e.Description?.Length > 50 ? e.Description[..47] + "..." : e.Description ?? "—")</td>
+                        <td class="text-end fw-semibold">£@e.AmountGbp.ToString("N2")</td>
+                        <td><span class="badge @badgeClass px-2 py-1" style="border-radius:6px;font-size:.78rem;">@e.StatusName</span></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
