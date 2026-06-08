@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Expense Chat UI</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <h1>Expense AI Chat</h1>
+      <p>Use natural language to query and manage expense data via backend APIs.</p>
+    </header>
+
+    <section id="chat-window" class="chat-window"></section>
+
+    <form id="chat-form" class="chat-form">
+      <input id="prompt" type="text" placeholder="Try: list submitted expenses for alice@example.co.uk" required />
+      <button type="submit">Send</button>
+    </form>
+  </main>
+
+  <script src="chat.js"></script>
+</body>
+</html>

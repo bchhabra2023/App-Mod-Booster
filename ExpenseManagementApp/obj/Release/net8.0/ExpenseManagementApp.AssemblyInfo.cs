@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ExpenseManagementApp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b238d502a89bd3e70b0a0a3c4b6744b5e5d4ac28")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+be72bd7f14509be9a6d49a0f8c1505928da20e8c")]
 [assembly: System.Reflection.AssemblyProductAttribute("ExpenseManagementApp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ExpenseManagementApp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

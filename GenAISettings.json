@@ -1,0 +1,7 @@
+{
+  "OpenAIEndpoint": "",
+  "OpenAIModelName": "gpt-4o",
+  "OpenAIRegion": "swedencentral",
+  "SearchEndpoint": "",
+  "ManagedIdentityClientId": ""
+}
