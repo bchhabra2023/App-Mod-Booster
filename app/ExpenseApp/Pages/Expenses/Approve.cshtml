@@ -53,11 +53,11 @@
                             <td>
                                 <div class="d-flex gap-2">
                                     <button class="btn btn-success-custom btn-approve"
-                                            data-expense-id="@e.ExpenseId" data-reviewer="2">
+                                            data-expense-id="@e.ExpenseId" data-reviewer="@Model.ReviewerUserId">
                                         <i class="bi bi-check-lg me-1"></i>Approve
                                     </button>
                                     <button class="btn btn-danger-custom btn-reject"
-                                            data-expense-id="@e.ExpenseId" data-reviewer="2">
+                                            data-expense-id="@e.ExpenseId" data-reviewer="@Model.ReviewerUserId">
                                         <i class="bi bi-x-lg me-1"></i>Reject
                                     </button>
                                 </div>

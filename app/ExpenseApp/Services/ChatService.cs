@@ -101,11 +101,11 @@ public class ChatService : IChatService
                         "properties": {
                             "userId":      { "type": "integer", "description": "ID of the user creating the expense" },
                             "categoryId":  { "type": "integer", "description": "ID of the expense category" },
-                            "amountPence": { "type": "integer", "description": "Amount in pence (e.g. 1250 for £12.50)" },
+                            "amountMinor": { "type": "integer", "description": "Amount in minor units/pence (e.g. 1250 for £12.50)" },
                             "expenseDate": { "type": "string",  "description": "Date of the expense in YYYY-MM-DD format" },
                             "description": { "type": "string",  "description": "Optional description of the expense" }
                         },
-                        "required": ["userId", "categoryId", "amountPence", "expenseDate"]
+                        "required": ["userId", "categoryId", "amountMinor", "expenseDate"]
                     }
                     """)),
 
@@ -268,7 +268,7 @@ public class ChatService : IChatService
         {
             UserId      = root.GetProperty("userId").GetInt32(),
             CategoryId  = root.GetProperty("categoryId").GetInt32(),
-            AmountMinor = root.GetProperty("amountPence").GetInt32(),
+            AmountMinor = root.GetProperty("amountMinor").GetInt32(),
             ExpenseDate = DateTime.Parse(root.GetProperty("expenseDate").GetString()!),
             Description = root.TryGetProperty("description", out var desc) ? desc.GetString() : null,
         };
